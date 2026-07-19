@@ -88,16 +88,28 @@
       const button = document.querySelector('#submit-button');
       const results = document.querySelector('#results');
       const translations = {
-        pt: { title: 'Calibre o registro do seu inglês.', subtitle: 'Uma leitura sociolinguística para quem fala português brasileiro e quer escrever com mais precisão em inglês.', slogan: 'Busco todos os ossos quebrados no seu texto.', aboutLink: 'Sobre o Tino', copyrightPrefix: 'Todos os direitos reservados a ', copyrightLink: 'Rapôso, 2026', textLabel: 'Seu texto em inglês', textHint: 'Entre 50 e 500 palavras.', contextLabel: 'Para qual contexto você está escrevendo?', academic: 'Acadêmico', professional: 'Profissional', casual: 'Casual', submit: 'Analisar registro', overall: 'Leitura geral', points: 'Pontos para calibrar', patterns: 'Padrões recorrentes', count: 'palavras', empty: 'Nenhum desvio de registro para calibrar neste texto.', tooShort: 'Escreva entre 50 e 500 palavras antes de analisar.', analyzing: 'Analisando...', error: 'Não foi possível analisar o texto.' },
-        en: { title: 'Calibrate your English register.', subtitle: 'A sociolinguistic reading for Portuguese speakers who want to write more precisely in English.', slogan: 'I sniff out every broken bone in your text.', aboutLink: 'About Tino', copyrightPrefix: 'All rights reserved to ', copyrightLink: 'Rapôso, 2026', textLabel: 'Your English text', textHint: 'Between 50 and 500 words.', contextLabel: 'What context are you writing for?', academic: 'Academic', professional: 'Professional', casual: 'Casual', submit: 'Analyze register', overall: 'Overall reading', points: 'Points to calibrate', patterns: 'Recurring patterns', count: 'words', empty: 'No register shifts to calibrate in this text.', tooShort: 'Write between 50 and 500 words before analyzing.', analyzing: 'Analyzing...', error: 'Could not analyze the text.' }
+        pt: { title: 'Calibre o registro do seu inglês.', subtitle: 'Uma leitura sociolinguística para quem fala português brasileiro e quer escrever com mais precisão em inglês.', slogan: 'Busco todos os ossos quebrados no seu texto.', aboutLink: 'Sobre o Tino', copyrightPrefix: 'Todos os direitos reservados a ', copyrightLink: 'Rapôso, 2026', textLabel: 'Seu texto em inglês', textHint: 'Entre 50 e 500 palavras.', contextLabel: 'Para qual contexto você está escrevendo?', academic: 'Acadêmico', professional: 'Profissional', casual: 'Casual', submit: 'Analisar registro', overall: 'Leitura geral', points: 'Pontos para calibrar', patterns: 'Padrões recorrentes', count: 'palavras', empty: 'Nenhum desvio de registro para calibrar neste texto.', tooShort: 'Escreva entre 50 e 500 palavras antes de analisar.', analyzing: 'Analisando...', error: 'Não foi possível analisar o texto.', issue: 'Questão', registerBreak: 'Quebra de registro', transfer: 'Hipótese de transferência', whyFails: 'Por que não funciona aqui', alternative: 'Alternativa' },
+        en: { title: 'Calibrate your English register.', subtitle: 'A sociolinguistic reading for Portuguese speakers who want to write more precisely in English.', slogan: 'I sniff out every broken bone in your text.', aboutLink: 'About Tino', copyrightPrefix: 'All rights reserved to ', copyrightLink: 'Rapôso, 2026', textLabel: 'Your English text', textHint: 'Between 50 and 500 words.', contextLabel: 'What context are you writing for?', academic: 'Academic', professional: 'Professional', casual: 'Casual', submit: 'Analyze register', overall: 'Overall reading', points: 'Points to calibrate', patterns: 'Recurring patterns', count: 'words', empty: 'No register shifts to calibrate in this text.', tooShort: 'Write between 50 and 500 words before analyzing.', analyzing: 'Analyzing...', error: 'Could not analyze the text.', issue: 'Issue', registerBreak: 'Register shift', transfer: 'Transfer hypothesis', whyFails: 'Why it fails here', alternative: 'Alternative' }
       };
       let language = (navigator.language || '').toLowerCase().startsWith('en') ? 'en' : 'pt';
-      function setLanguage(next) {
+      let originalAnalysis = null;
+      let translatedAnalysis = null;
+      async function setLanguage(next) {
         language = next;
         document.documentElement.lang = next === 'en' ? 'en' : 'pt-BR';
         document.querySelectorAll('[data-i18n]').forEach((node) => { node.textContent = translations[next][node.dataset.i18n]; });
         document.querySelectorAll('.language-button').forEach((node) => { const active = node.dataset.language === next; node.className = `language-button rounded-full px-3 py-1 ${active ? 'bg-teal-700 text-white' : 'text-stone-600'}`; });
         updateCount();
+        if (originalAnalysis && next === 'en') {
+          if (!translatedAnalysis) {
+            try {
+              const response = await fetch('/translate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ analysis: originalAnalysis }) });
+              if (!response.ok) throw new Error();
+              translatedAnalysis = await response.json();
+            } catch { return; }
+          }
+          render(translatedAnalysis, false);
+        } else if (originalAnalysis) render(originalAnalysis, false);
       }
       document.querySelectorAll('.language-button').forEach((button) => button.addEventListener('click', () => setLanguage(button.dataset.language)));
 
@@ -121,7 +133,7 @@
         return wrapper;
       }
 
-      function render(data) {
+      function render(data, scroll = true) {
         document.querySelector('#overall-assessment').textContent = data.overall_assessment || '';
         const annotations = document.querySelector('#annotations');
         annotations.replaceChildren();
@@ -139,14 +151,14 @@
             quote.textContent = `“${item.quote}”`;
             const issue = document.createElement('p');
             issue.className = 'mt-4 font-semibold text-teal-800';
-            issue.textContent = item.issue;
+              issue.textContent = `${translations[language].issue}: ${item.issue}`;
             const details = document.createElement('dl');
             details.className = 'mt-5 grid gap-4 sm:grid-cols-2';
             details.append(
-              field('Quebra de registro', item.register_break),
-              field('Hipótese de transferência', item.transfer_hypothesis),
-              field('Por que não funciona aqui', item.why_it_fails),
-              field('Alternativa', item.rewrite_suggestion)
+              field(translations[language].registerBreak, item.register_break),
+              field(translations[language].transfer, item.transfer_hypothesis),
+              field(translations[language].whyFails, item.why_it_fails),
+              field(translations[language].alternative, item.rewrite_suggestion)
             );
             card.append(quote, issue, details);
             annotations.append(card);
@@ -160,7 +172,7 @@
           summary.append(item);
         });
         results.classList.remove('hidden');
-        results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (scroll) results.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
 
       form.addEventListener('submit', async (event) => {
@@ -185,6 +197,8 @@
           });
           const data = await response.json();
           if (!response.ok) throw new Error(translations[language].error);
+          originalAnalysis = data;
+          translatedAnalysis = null;
           render(data);
         } catch (error) {
           errorBox.textContent = error.message;

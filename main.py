@@ -1,6 +1,7 @@
 import json
 import os
 from pathlib import Path
+from typing import Any
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
@@ -75,6 +76,10 @@ class AnalysisRequest(BaseModel):
     context: str
 
 
+class TranslationRequest(BaseModel):
+    analysis: dict[str, Any]
+
+
 def parse_model_json(raw: str) -> dict:
     cleaned = raw.strip()
     if cleaned.startswith("```"):
@@ -135,3 +140,24 @@ async def analyze(request: AnalysisRequest) -> dict:
         raise
     except Exception as exc:
         raise HTTPException(502, "Não foi possível gerar a análise agora. Tente novamente.") from exc
+
+
+@app.post("/translate")
+async def translate(request: TranslationRequest) -> dict:
+    """Translate the displayed Portuguese report for the English interface."""
+    if not os.getenv("OPENAI_API_KEY"):
+        raise HTTPException(500, "OPENAI_API_KEY não foi configurada.")
+    translation_prompt = """Translate this Tino sociolinguistic report from Brazilian Portuguese into natural English.
+Keep exactly the same JSON structure and array lengths. Translate only natural-language fields: overall_assessment, issue, register_break, transfer_hypothesis, why_it_fails, and transfer_pattern_summary. Keep quote and rewrite_suggestion unchanged because they are excerpts or English alternatives. Return valid JSON only."""
+    try:
+        response = OpenAI().responses.create(
+            model="gpt-5.6",
+            instructions=translation_prompt,
+            input=json.dumps(request.analysis, ensure_ascii=False),
+            text={"format": {"type": "json_object"}},
+        )
+        return parse_model_json(response.output_text)
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(502, "Não foi possível traduzir a análise agora.") from exc

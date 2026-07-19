@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tino by Rapôso, 2026</title>
+    <meta name="description" content="Busco todos os ossos quebrados no seu texto." />
+    <link rel="canonical" href="https://tino-deploy.vercel.app/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://tino-deploy.vercel.app/" />
+    <meta property="og:title" content="Tino by Rapôso, 2026" />
+    <meta property="og:description" content="Busco todos os ossos quebrados no seu texto." />
+    <meta property="og:image" content="https://tino-deploy.vercel.app/assets/tino-mascot.png" />
+    <meta property="og:image:alt" content="Mascote Tino, um cachorrinho sobre a marca Tino" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Tino by Rapôso, 2026" />
+    <meta name="twitter:description" content="Busco todos os ossos quebrados no seu texto." />
+    <meta name="twitter:image" content="https://tino-deploy.vercel.app/assets/tino-mascot.png" />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="min-h-screen bg-stone-50 text-stone-900">
+    <main class="mx-auto max-w-4xl px-5 py-12 sm:py-20">
+      <section class="mb-10">
+        <img src="/assets/tino-mascot.png" alt="Mascote Tino, um cachorrinho sobre a marca Tino" class="mx-auto mb-6 w-52 rounded-3xl" />
+        <p data-i18n="slogan" class="mb-5 text-center font-medium italic text-teal-700">Busco todos os ossos quebrados no seu texto.</p>
+        <div class="mb-3 flex items-center justify-end gap-4">
+          <div class="flex rounded-full border border-stone-300 bg-white p-1 text-xs font-semibold" aria-label="Language selector">
+            <button type="button" data-language="pt" class="language-button rounded-full bg-teal-700 px-3 py-1 text-white">PT</button>
+            <button type="button" data-language="en" class="language-button rounded-full px-3 py-1 text-stone-600">EN</button>
+          </div>
+        </div>
+        <h1 data-i18n="title" class="text-4xl font-semibold tracking-tight sm:text-5xl">Calibre o registro do seu inglês.</h1>
+        <p data-i18n="subtitle" class="mt-4 max-w-2xl text-lg leading-8 text-stone-600">Uma leitura sociolinguística para quem fala português brasileiro e quer escrever com mais precisão em inglês.</p>
+      </section>
+      <form id="analysis-form" class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+        <label data-i18n="textLabel" for="text" class="block text-base font-semibold">Seu texto em inglês</label>
+        <p data-i18n="textHint" class="mt-1 text-sm text-stone-500">Entre 50 e 500 palavras.</p>
+        <textarea id="text" rows="10" required class="mt-4 w-full rounded-xl border border-stone-300 p-4 leading-7 outline-none transition focus:border-teal-600 focus:ring-2 focus:ring-teal-100" placeholder="Paste or write your English text here..."></textarea>
+        <p id="word-count" class="mt-2 text-sm text-stone-500">0 / 50–500 palavras</p>
+
+        <fieldset class="mt-7">
+          <legend data-i18n="contextLabel" class="text-base font-semibold">Para qual contexto você está escrevendo?</legend>
+          <div class="mt-3 flex flex-wrap gap-3">
+            <label class="cursor-pointer rounded-full border border-stone-300 px-4 py-2 text-sm has-[:checked]:border-teal-700 has-[:checked]:bg-teal-50 has-[:checked]:text-teal-800"><input type="radio" name="context" value="academic" class="sr-only" checked /> <span data-i18n="academic">Acadêmico</span></label>
+            <label class="cursor-pointer rounded-full border border-stone-300 px-4 py-2 text-sm has-[:checked]:border-teal-700 has-[:checked]:bg-teal-50 has-[:checked]:text-teal-800"><input type="radio" name="context" value="professional" class="sr-only" /> <span data-i18n="professional">Profissional</span></label>
+            <label class="cursor-pointer rounded-full border border-stone-300 px-4 py-2 text-sm has-[:checked]:border-teal-700 has-[:checked]:bg-teal-50 has-[:checked]:text-teal-800"><input type="radio" name="context" value="casual" class="sr-only" /> <span data-i18n="casual">Casual</span></label>
+          </div>
+        </fieldset>
+
+        <p id="form-error" class="mt-5 hidden rounded-lg bg-red-50 p-3 text-sm text-red-700" role="alert"></p>
+        <button data-i18n="submit" id="submit-button" type="submit" class="mt-7 inline-flex items-center justify-center rounded-xl bg-teal-700 px-5 py-3 font-semibold text-white transition hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-60">Analisar registro</button>
+      </form>
+
+      <section id="results" class="mt-10 hidden" aria-live="polite">
+        <div class="rounded-2xl border border-teal-100 bg-teal-50 p-6 sm:p-8">
+          <p data-i18n="overall" class="text-sm font-semibold uppercase tracking-wider text-teal-800">Leitura geral</p>
+          <p id="overall-assessment" class="mt-3 text-lg leading-8 text-stone-800"></p>
+        </div>
+        <div class="mt-8">
+          <h2 data-i18n="points" class="text-2xl font-semibold">Pontos para calibrar</h2>
+          <div id="annotations" class="mt-4 grid gap-4"></div>
+        </div>
+        <div class="mt-8 rounded-2xl border border-stone-200 bg-white p-6">
+          <h2 data-i18n="patterns" class="text-xl font-semibold">Padrões recorrentes</h2>
+          <ul id="transfer-summary" class="mt-3 list-disc space-y-2 pl-5 leading-7 text-stone-700"></ul>
+        </div>
+      </section>
+      <footer class="mt-14 border-t border-stone-200 pt-5 text-center text-sm text-stone-500">
+        <a href="/about" class="mr-3 text-teal-700 hover:text-teal-800">Sobre o Tino</a>
+        <span data-i18n="copyrightPrefix">Todos os direitos reservados a </span><a data-i18n="copyrightLink" href="https://devpost.com/Gutembergfox" target="_blank" rel="noreferrer" class="text-teal-700 hover:text-teal-800">Rapôso, 2026</a>
+      </footer>
+    </main>
+
+    <script>
+      const form = document.querySelector('#analysis-form');
+      const textarea = document.querySelector('#text');
+      const count = document.querySelector('#word-count');
+      const errorBox = document.querySelector('#form-error');
+      const button = document.querySelector('#submit-button');
+      const results = document.querySelector('#results');
+      const translations = {
+        pt: { title: 'Calibre o registro do seu inglês.', subtitle: 'Uma leitura sociolinguística para quem fala português brasileiro e quer escrever com mais precisão em inglês.', slogan: 'Busco todos os ossos quebrados no seu texto.', copyrightPrefix: 'Todos os direitos reservados a ', copyrightLink: 'Rapôso, 2026', textLabel: 'Seu texto em inglês', textHint: 'Entre 50 e 500 palavras.', contextLabel: 'Para qual contexto você está escrevendo?', academic: 'Acadêmico', professional: 'Profissional', casual: 'Casual', submit: 'Analisar registro', overall: 'Leitura geral', points: 'Pontos para calibrar', patterns: 'Padrões recorrentes', count: 'palavras', empty: 'Nenhum desvio de registro para calibrar neste texto.', tooShort: 'Escreva entre 50 e 500 palavras antes de analisar.', analyzing: 'Analisando...', error: 'Não foi possível analisar o texto.' },
+        en: { title: 'Calibrate your English register.', subtitle: 'A sociolinguistic reading for Portuguese speakers who want to write more precisely in English.', slogan: 'I sniff out every broken bone in your text.', copyrightPrefix: 'All rights reserved to ', copyrightLink: 'Rapôso, 2026', textLabel: 'Your English text', textHint: 'Between 50 and 500 words.', contextLabel: 'What context are you writing for?', academic: 'Academic', professional: 'Professional', casual: 'Casual', submit: 'Analyze register', overall: 'Overall reading', points: 'Points to calibrate', patterns: 'Recurring patterns', count: 'words', empty: 'No register shifts to calibrate in this text.', tooShort: 'Write between 50 and 500 words before analyzing.', analyzing: 'Analyzing...', error: 'Could not analyze the text.' }
+      };
+      let language = (navigator.language || '').toLowerCase().startsWith('en') ? 'en' : 'pt';
+      function setLanguage(next) {
+        language = next;
+        document.documentElement.lang = next === 'en' ? 'en' : 'pt-BR';
+        document.querySelectorAll('[data-i18n]').forEach((node) => { node.textContent = translations[next][node.dataset.i18n]; });
+        document.querySelectorAll('.language-button').forEach((node) => { const active = node.dataset.language === next; node.className = `language-button rounded-full px-3 py-1 ${active ? 'bg-teal-700 text-white' : 'text-stone-600'}`; });
+        updateCount();
+      }
+      document.querySelectorAll('.language-button').forEach((button) => button.addEventListener('click', () => setLanguage(button.dataset.language)));
+
+      function words(value) { return value.trim() ? value.trim().split(/\s+/).length : 0; }
+      function updateCount() {
+        const total = words(textarea.value);
+        count.textContent = `${total} / 50–500 ${translations[language].count}`;
+        count.className = `mt-2 text-sm ${total > 500 ? 'text-red-600' : 'text-stone-500'}`;
+      }
+      textarea.addEventListener('input', updateCount);
+
+      function field(label, value) {
+        const wrapper = document.createElement('div');
+        const heading = document.createElement('dt');
+        const body = document.createElement('dd');
+        heading.className = 'font-medium text-stone-800';
+        body.className = 'mt-1 leading-6 text-stone-600';
+        heading.textContent = label;
+        body.textContent = value || '—';
+        wrapper.append(heading, body);
+        return wrapper;
+      }
+
+      function render(data) {
+        document.querySelector('#overall-assessment').textContent = data.overall_assessment || '';
+        const annotations = document.querySelector('#annotations');
+        annotations.replaceChildren();
+        if (!data.annotations?.length) {
+          const empty = document.createElement('p');
+          empty.className = 'rounded-xl border border-stone-200 bg-white p-5 text-stone-600';
+          empty.textContent = translations[language].empty;
+          annotations.append(empty);
+        } else {
+          data.annotations.forEach((item) => {
+            const card = document.createElement('article');
+            card.className = 'rounded-2xl border border-stone-200 bg-white p-6 shadow-sm';
+            const quote = document.createElement('blockquote');
+            quote.className = 'border-l-4 border-teal-600 pl-4 font-medium italic text-stone-800';
+            quote.textContent = `“${item.quote}”`;
+            const issue = document.createElement('p');
+            issue.className = 'mt-4 font-semibold text-teal-800';
+            issue.textContent = item.issue;
+            const details = document.createElement('dl');
+            details.className = 'mt-5 grid gap-4 sm:grid-cols-2';
+            details.append(
+              field('Quebra de registro', item.register_break),
+              field('Hipótese de transferência', item.transfer_hypothesis),
+              field('Por que não funciona aqui', item.why_it_fails),
+              field('Alternativa', item.rewrite_suggestion)
+            );
+            card.append(quote, issue, details);
+            annotations.append(card);
+          });
+        }
+        const summary = document.querySelector('#transfer-summary');
+        summary.replaceChildren();
+        String(data.transfer_pattern_summary || '').split(/\n|(?<=[.!?])\s+(?=[A-ZÀ-Ü])/).filter(Boolean).forEach((point) => {
+          const item = document.createElement('li');
+          item.textContent = point.trim();
+          summary.append(item);
+        });
+        results.classList.remove('hidden');
+        results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const wordCount = words(textarea.value);
+        errorBox.classList.add('hidden');
+        if (wordCount < 50 || wordCount > 500) {
+          errorBox.textContent = translations[language].tooShort;
+          errorBox.classList.remove('hidden');
+          return;
+        }
+        button.disabled = true;
+        button.textContent = translations[language].analyzing;
+        try {
+          const response = await fetch('/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              text: textarea.value.trim(),
+              context: document.querySelector('input[name="context"]:checked').value
+            })
+          });
+          const data = await response.json();
+          if (!response.ok) throw new Error(translations[language].error);
+          render(data);
+        } catch (error) {
+          errorBox.textContent = error.message;
+          errorBox.classList.remove('hidden');
+        } finally {
+          button.disabled = false;
+          button.textContent = translations[language].submit;
+        }
+      });
+      setLanguage(language);
+    </script>
+  </body>
+</html>

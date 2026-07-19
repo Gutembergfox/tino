@@ -147,8 +147,8 @@ async def translate(request: TranslationRequest) -> dict:
     """Translate the displayed Portuguese report for the English interface."""
     if not os.getenv("OPENAI_API_KEY"):
         raise HTTPException(500, "OPENAI_API_KEY não foi configurada.")
-    translation_prompt = """Translate this Tino sociolinguistic report from Brazilian Portuguese into natural English.
-Keep exactly the same JSON structure and array lengths. Translate only natural-language fields: overall_assessment, issue, register_break, transfer_hypothesis, why_it_fails, and transfer_pattern_summary. Keep quote and rewrite_suggestion unchanged because they are excerpts or English alternatives. Return valid JSON only."""
+    translation_prompt = """You are translating a Tino report for an English-language interface. Translate every Portuguese sentence in the supplied JSON into natural, precise English.
+Keep exactly the same JSON keys, structure, and annotation count. Translate the values of overall_assessment, issue, register_break, transfer_hypothesis, why_it_fails, and transfer_pattern_summary. Keep quote and rewrite_suggestion unchanged because they are learner excerpts or English alternatives. Do not summarize, omit, or leave Portuguese text in those fields. Return valid JSON only."""
     try:
         response = OpenAI().responses.create(
             model="gpt-5.6",

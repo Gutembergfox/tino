@@ -56,3 +56,28 @@ Analyzes an English text against a target register.
 - `502`: OpenAI request failure or invalid model JSON.
 
 The frontend intentionally displays a localized generic error instead of exposing provider or credential details.
+
+## `POST /translate`
+
+Translates a completed Portuguese report for the English interface. The endpoint preserves the JSON structure and annotation count, translates explanatory fields, and leaves learner quotes and English rewrite suggestions unchanged.
+
+### Request
+
+```json
+{
+  "analysis": {
+    "target_register": "academic",
+    "overall_assessment": "...",
+    "annotations": [],
+    "transfer_pattern_summary": "..."
+  }
+}
+```
+
+## `POST /analyze-pt`
+
+Analyzes Brazilian Portuguese text for academic, professional, or casual register. It returns the same JSON shape as `/analyze`, with natural-language fields in Brazilian Portuguese. The prompt may use Jespersen's Cycle and Van Gelderen's linguistic-cycle framework when the text provides evidence; it does not treat language change or variation as an error.
+
+## Installable web app and citations
+
+`GET /manifest.webmanifest` and `GET /service-worker.js` support PWA installation. Generated reports show a copyable ABNT reference identifying Tino as software and recording the analysis access date and time. The fixed software reference is also listed on `/about`.

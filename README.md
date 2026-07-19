@@ -15,6 +15,10 @@ https://tino-deploy.vercel.app
 - Receive a structured JSON analysis in Brazilian Portuguese or English.
 - Identify likely transfer patterns such as `like`/`tipo`, `actually`/`atualmente`, `parents`/`parentes`, and conversational tag questions.
 - Switch the interface between Portuguese and English.
+- Translate an existing report into English while preserving learner quotes and suggestions.
+- Copy an ABNT software citation from each generated report, including its access timestamp.
+- Install the site as a PWA on supported Android and desktop browsers.
+- Analyze Brazilian Portuguese register with the dedicated `/analyze-pt` route, including optional lenses from Jespersen's Cycle and Van Gelderen's linguistic cycles.
 - Read the project's sociolinguistic rationale at `/about`.
 
 ## Local setup
@@ -51,6 +55,8 @@ https://tino-deploy.vercel.app
 The FastAPI backend serves `index.html`, validates the submitted text and context, sends the request to the OpenAI Responses API using `gpt-5.6`, and parses the model output as JSON. The full sociolinguistic instruction set lives in the `SYSTEM_PROMPT` constant in `main.py`.
 
 The frontend renders the overall assessment, register-break annotations, transfer hypotheses, rewrite suggestions, and recurring transfer patterns. The OpenAI API key remains server-side and is never sent to the browser.
+
+The frontend can request `/translate` when the user switches a completed report to English. Reports also include a copyable ABNT reference for the software. `manifest.webmanifest` and `service-worker.js` provide installable PWA behavior; the service worker uses versioned cache names so UI updates invalidate older cached assets.
 
 ## How Codex and GPT-5.6 were used
 

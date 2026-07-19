@@ -72,6 +72,14 @@
           <h2 data-i18n="patterns" class="text-xl font-semibold">Padrões recorrentes</h2>
           <ul id="transfer-summary" class="mt-3 list-disc space-y-2 pl-5 leading-7 text-stone-700"></ul>
         </div>
+        <div class="mt-8 rounded-2xl border border-teal-200 bg-teal-50 p-6">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <h2 data-i18n="citationLabel" class="text-lg font-semibold text-teal-900">Como citar o Tino no seu trabalho:</h2>
+            <button id="copy-citation" type="button" data-i18n="copyCitation" class="rounded-lg bg-teal-700 px-3 py-2 text-sm font-semibold text-white hover:bg-teal-800">Copiar citação</button>
+          </div>
+          <p id="citation-text" class="mt-4 rounded-lg bg-white p-4 text-sm leading-6 text-stone-700"></p>
+          <p id="copy-status" class="mt-2 hidden text-sm text-teal-800" role="status"></p>
+        </div>
       </section>
       <footer class="mt-14 border-t border-stone-200 pt-5 text-center text-sm text-stone-500">
         <a data-i18n="aboutLink" href="/about" class="mr-3 text-teal-700 hover:text-teal-800">Sobre o Tino</a>
@@ -90,11 +98,17 @@
       const results = document.querySelector('#results');
       const translations = {
         pt: { title: 'Calibre o registro do seu inglês.', subtitle: 'Uma leitura sociolinguística para quem fala português brasileiro e quer escrever com mais precisão em inglês.', slogan: 'Busco todos os ossos quebrados no seu texto.', aboutLink: 'Sobre o Tino', copyrightPrefix: 'Todos os direitos reservados a ', copyrightLink: 'Rapôso, 2026', textLabel: 'Seu texto em inglês', textHint: 'Entre 50 e 500 palavras.', contextLabel: 'Para qual contexto você está escrevendo?', academic: 'Acadêmico', professional: 'Profissional', casual: 'Casual', submit: 'Analisar registro', overall: 'Leitura geral', points: 'Pontos para calibrar', patterns: 'Padrões recorrentes', count: 'palavras', empty: 'Nenhum desvio de registro para calibrar neste texto.', tooShort: 'Escreva entre 50 e 500 palavras antes de analisar.', analyzing: 'Analisando...', error: 'Não foi possível analisar o texto.', translationError: 'Não foi possível traduzir o relatório agora. Tente novamente.', issue: 'Questão', registerBreak: 'Quebra de registro', transfer: 'Hipótese de transferência', whyFails: 'Por que não funciona aqui', alternative: 'Alternativa' },
-        en: { title: 'Calibrate your English register.', subtitle: 'A sociolinguistic reading for Portuguese speakers who want to write more precisely in English.', slogan: 'I sniff out every broken bone in your text.', aboutLink: 'About Tino', copyrightPrefix: 'All rights reserved to ', copyrightLink: 'Rapôso, 2026', textLabel: 'Your English text', textHint: 'Between 50 and 500 words.', contextLabel: 'What context are you writing for?', academic: 'Academic', professional: 'Professional', casual: 'Casual', submit: 'Analyze register', overall: 'Overall reading', points: 'Points to calibrate', patterns: 'Recurring patterns', count: 'words', empty: 'No register shifts to calibrate in this text.', tooShort: 'Write between 50 and 500 words before analyzing.', analyzing: 'Analyzing...', error: 'Could not analyze the text.', translationError: 'The report could not be translated right now. Please try again.', issue: 'Issue', registerBreak: 'Register shift', transfer: 'Transfer hypothesis', whyFails: 'Why it fails here', alternative: 'Alternative' }
+        en: { title: 'Calibrate your English register.', subtitle: 'A sociolinguistic reading for Portuguese speakers who want to write more precisely in English.', slogan: 'I sniff out every broken bone in your text.', aboutLink: 'About Tino', copyrightPrefix: 'All rights reserved to ', copyrightLink: 'Rapôso, 2026', textLabel: 'Your English text', textHint: 'Between 50 and 500 words.', contextLabel: 'What context are you writing for?', academic: 'Academic', professional: 'Professional', casual: 'Casual', submit: 'Analyze register', overall: 'Overall reading', points: 'Points to calibrate', patterns: 'Recurring patterns', count: 'words', empty: 'No register shifts to calibrate in this text.', tooShort: 'Write between 50 and 500 words before analyzing.', analyzing: 'Analyzing...', error: 'Could not analyze the text.', translationError: 'The report could not be translated right now. Please try again.', citationLabel: 'How to cite Tino in your work:', copyCitation: 'Copy citation', copied: 'Citation copied.', issue: 'Issue', registerBreak: 'Register shift', transfer: 'Transfer hypothesis', whyFails: 'Why it fails here', alternative: 'Alternative' }
       };
       let language = (navigator.language || '').toLowerCase().startsWith('en') ? 'en' : 'pt';
       let originalAnalysis = null;
       let translatedAnalysis = null;
+      let analysisTimestamp = null;
+      function citationText() {
+        const date = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Fortaleza', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(analysisTimestamp || new Date()).replace('.', '');
+        return `RAPÔSO, Gutemberg. Tino: sociolinguistic English register calibration [software]. 2026. Disponível em: https://tino-deploy.vercel.app. Acesso em: ${date} (BRT).`;
+      }
+      function updateCitation() { document.querySelector('#citation-text').textContent = citationText(); }
       async function setLanguage(next) {
         language = next;
         document.documentElement.lang = next === 'en' ? 'en' : 'pt-BR';
@@ -178,6 +192,7 @@
         });
         results.classList.remove('hidden');
         if (scroll) results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        updateCitation();
       }
 
       form.addEventListener('submit', async (event) => {
@@ -203,6 +218,7 @@
           const data = await response.json();
           if (!response.ok) throw new Error(translations[language].error);
           originalAnalysis = data;
+          analysisTimestamp = new Date();
           translatedAnalysis = null;
           render(data);
         } catch (error) {
@@ -212,6 +228,13 @@
           button.disabled = false;
           button.textContent = translations[language].submit;
         }
+      });
+      document.querySelector('#copy-citation').addEventListener('click', async () => {
+        await navigator.clipboard.writeText(document.querySelector('#citation-text').textContent);
+        const status = document.querySelector('#copy-status');
+        status.textContent = translations[language].copied;
+        status.classList.remove('hidden');
+        setTimeout(() => status.classList.add('hidden'), 2200);
       });
       setLanguage(language);
     </script>

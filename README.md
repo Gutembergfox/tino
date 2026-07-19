@@ -81,3 +81,15 @@ The project treats register as language associated with a situation of use and t
 ## License and attribution
 
 Tino by Rapôso, 2026.
+
+## Testing the sociolinguistic model
+
+Run the direct model test from the project root:
+
+```bash
+python3 test_tino.py
+```
+
+The script loads `OPENAI_API_KEY` from `.env`, sends a controlled academic-register sample to `gpt-5.6`, prints the raw response, and validates that the result is JSON. It checks the same transfer-oriented behavior used by the application, including conversational markers, false cognates, and Portuguese calques.
+
+See [`docs/TESTING.md`](docs/TESTING.md) for the test rationale, expected output contract, and troubleshooting guidance.

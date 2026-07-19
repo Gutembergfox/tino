@@ -98,6 +98,16 @@ async def about() -> FileResponse:
     return FileResponse(BASE_DIR / "about.html")
 
 
+@app.get("/manifest.webmanifest", response_class=FileResponse)
+async def manifest() -> FileResponse:
+    return FileResponse(BASE_DIR / "manifest.webmanifest", media_type="application/manifest+json")
+
+
+@app.get("/service-worker.js", response_class=FileResponse)
+async def service_worker() -> FileResponse:
+    return FileResponse(BASE_DIR / "service-worker.js", media_type="application/javascript")
+
+
 @app.post("/analyze")
 async def analyze(request: AnalysisRequest) -> dict:
     text = request.text.strip()

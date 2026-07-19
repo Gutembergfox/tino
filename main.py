@@ -199,10 +199,13 @@ Keep exactly the same JSON keys, structure, and annotation count. Translate the 
         response = OpenAI().responses.create(
             model="gpt-5.6",
             instructions=translation_prompt,
-            input=json.dumps(request.analysis, ensure_ascii=False),
+            input=("Translate the following JSON now. Do not discuss the task; return only the translated JSON.\n" + json.dumps(request.analysis, ensure_ascii=False)),
             text={"format": {"type": "json_object"}},
         )
-        return parse_model_json(response.output_text)
+        translated = parse_model_json(response.output_text)
+        if not translated.get("overall_assessment"):
+            raise HTTPException(502, "A tradução retornou um formato incompleto.")
+        return translated
     except HTTPException:
         raise
     except Exception as exc:

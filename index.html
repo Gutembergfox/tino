@@ -74,10 +74,10 @@
         </div>
         <div class="mt-8 rounded-2xl border border-teal-200 bg-teal-50 p-6">
           <div class="flex flex-wrap items-center justify-between gap-3">
-            <h2 data-i18n="citationLabel" class="text-lg font-semibold text-teal-900">Como citar o Tino no seu trabalho:</h2>
-            <button id="copy-citation" type="button" data-i18n="copyCitation" aria-label="Copiar citação" title="Copiar citação" class="inline-flex items-center justify-center rounded-lg bg-teal-700 p-2 text-white hover:bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+            <h2 class="text-lg font-semibold text-teal-900">Como citar o Tino no seu trabalho:</h2>
+            <button id="copy-citation" type="button" aria-label="Copiar citação" title="Copiar citação" class="inline-flex items-center justify-center rounded-lg bg-teal-700 p-2 text-white hover:bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
               <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="10" height="10" rx="1"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>
-              <span class="sr-only" data-i18n="copyCitation">Copiar citação</span>
+              <span class="sr-only">Copiar citação</span>
             </button>
           </div>
           <p id="citation-text" class="mt-4 rounded-lg bg-white p-4 text-sm leading-6 text-stone-700"></p>
@@ -124,6 +124,7 @@
               const response = await fetch('/translate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ analysis: originalAnalysis }) });
               if (!response.ok) throw new Error();
               translatedAnalysis = await response.json();
+              if (!translatedAnalysis.overall_assessment) throw new Error();
             } catch {
               errorBox.textContent = translations[language].translationError;
               errorBox.classList.remove('hidden');

@@ -70,6 +70,27 @@ TONE: pedagogical, direct, warm. Never condescending. Treat the learner as someo
 LANGUAGE: all natural-language fields in your output must be in Brazilian Portuguese. Only "quote" and "rewrite_suggestion" remain in English, because they reference the learner's English text.
 REFUSAL TO ACT AS GRAMMAR CHECKER: if the user's input contains pure grammar errors with no register implication, note them briefly in "overall_assessment" but do not create annotations for them. Tino is not a grammar checker. If there are zero register issues, set "annotations" to [] and say in overall_assessment that there is nothing to calibrate in this text."""
 
+PORTUGUESE_SYSTEM_PROMPT = """Você é o Tino, um assistente de calibração de registro para pessoas que escrevem em português brasileiro. Atua sob uma perspectiva da sociolinguística variacionista.
+
+SEU PAPEL NÃO É CORRIGIR GRAMÁTICA. Identifique inadequações de registro (acadêmico, profissional ou casual), marcas de oralidade, burocratês, regionalismos e escolhas que não combinam com o contexto declarado. Explique a função social de cada escolha e reconheça que variação e mudança linguística não são erros.
+
+LENTES DE MUDANÇA LINGUÍSTICA:
+- Considere o Ciclo de Jespersen ao analisar negação verbal: descreva com cautela estágios de reforço, como negação pré-verbal, reforço com elemento adicional e possível reanálise, sem afirmar que uma variante é intrinsecamente errada.
+- Considere a teoria dos ciclos linguísticos de Van Gelderen: observe ciclos de renovação, reanálise e gramaticalização (por exemplo, itens lexicais que assumem funções gramaticais), sempre distinguindo mudança histórica de inadequação ao registro atual.
+- Só use essas teorias quando houver evidência no texto; não force uma explicação histórica.
+
+FORMATO (JSON válido, sem markdown):
+{
+  "target_register": "academic | professional | casual",
+  "overall_assessment": "um parágrafo em português brasileiro, direto e acolhedor",
+  "annotations": [
+    {"quote": "subtrecho exato", "issue": "nome curto", "register_break": "registro e função social", "transfer_hypothesis": "hipótese sociolinguística ou 'não aplicável'", "why_it_fails": "por que não se ajusta ao contexto, sem chamar a variante de erro", "rewrite_suggestion": "alternativa concreta em português"}
+  ],
+  "transfer_pattern_summary": "2–3 padrões recorrentes observados"
+}
+
+Todos os campos naturais devem estar em português brasileiro. Se não houver desvio de registro, use annotations: [] e diga que não há nada a calibrar. Erros puramente gramaticais sem implicação de registro devem ser apenas mencionados no overall_assessment."""
+
 
 class AnalysisRequest(BaseModel):
     text: str = Field(min_length=1)
@@ -140,6 +161,31 @@ async def analyze(request: AnalysisRequest) -> dict:
         raise
     except Exception as exc:
         raise HTTPException(502, "Não foi possível gerar a análise agora. Tente novamente.") from exc
+
+
+@app.post("/analyze-pt")
+async def analyze_portuguese(request: AnalysisRequest) -> dict:
+    """Analyze Brazilian Portuguese register and sociolinguistic variation."""
+    text = request.text.strip()
+    context = request.context.strip().lower()
+    if context not in {"academic", "professional", "casual"}:
+        raise HTTPException(422, "Contexto inválido.")
+    if not 1 <= len(text.split()) <= 500:
+        raise HTTPException(422, "O texto deve ter entre 1 e 500 palavras.")
+    if not os.getenv("OPENAI_API_KEY"):
+        raise HTTPException(500, "OPENAI_API_KEY não foi configurada.")
+    try:
+        response = OpenAI().responses.create(
+            model="gpt-5.6",
+            instructions=PORTUGUESE_SYSTEM_PROMPT,
+            input=f"Registro declarado: {context}.\n\nTexto em português brasileiro:\n{text}",
+            text={"format": {"type": "json_object"}},
+        )
+        return parse_model_json(response.output_text)
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(502, "Não foi possível gerar a análise em português agora.") from exc
 
 
 @app.post("/translate")

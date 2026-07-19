@@ -52,6 +52,14 @@ The FastAPI backend serves `index.html`, validates the submitted text and contex
 
 The frontend renders the overall assessment, register-break annotations, transfer hypotheses, rewrite suggestions, and recurring transfer patterns. The OpenAI API key remains server-side and is never sent to the browser.
 
+## How Codex and GPT-5.6 were used
+
+This project was built with Codex as the primary development collaborator. Codex was used to shape the product concept, scaffold the FastAPI MVP, implement the bilingual frontend, integrate and debug the OpenAI Responses API, generate the mascot asset, write the sociolinguistic project pitch and technical documentation, run model smoke tests, and deploy the application to Vercel.
+
+GPT-5.6 is the runtime model behind Tino's analysis. It receives the project's sociolinguistic system prompt together with the learner's English text and declared target context, then returns structured JSON containing the overall assessment, register-break annotations, transfer hypotheses, and rewrite suggestions. The `test_tino.py` smoke test independently verifies that this GPT-5.6 response is valid JSON and contains the expected analysis fields.
+
+Codex accelerated the workflow by turning sociolinguistic requirements into a working product loop: prompt design, API contract, UI rendering, test fixture, deployment configuration, and judge-facing documentation were developed and checked together.
+
 ## Deploying to Vercel
 
 The repository includes `api/index.py` and `vercel.json` for Vercel deployment:

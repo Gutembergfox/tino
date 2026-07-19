@@ -202,8 +202,9 @@ Keep exactly the same JSON keys, structure, and annotation count. Translate the 
             input=("Translate the following JSON now. Do not discuss the task; return only the translated JSON.\n" + json.dumps(request.analysis, ensure_ascii=False)),
             text={"format": {"type": "json_object"}},
         )
-        translated = parse_model_json(response.output_text)
-        if not translated.get("overall_assessment"):
+        raw = response.output_text.strip()
+        translated = parse_model_json(raw)
+        if not translated.get("overall_assessment") or not isinstance(translated.get("annotations"), list):
             raise HTTPException(502, "A tradução retornou um formato incompleto.")
         return translated
     except HTTPException:

@@ -1,4 +1,4 @@
-const CACHE_NAME = "tino-static-v2";
+const CACHE_NAME = "tino-static-v3";
 const APP_SHELL = ["/", "/about", "/manifest.webmanifest", "/assets/tino-mascot.png", "/assets/tino-og.png"];
 
 self.addEventListener("install", (event) => {

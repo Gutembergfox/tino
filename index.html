@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tino by Rapôso, 2026</title>
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#0f766e" />
     <link rel="icon" type="image/png" href="/assets/tino-mascot.png" />
     <link rel="apple-touch-icon" href="/assets/tino-mascot.png" />
     <meta name="description" content="Busco todos os ossos quebrados no seu texto." />
@@ -77,6 +79,8 @@
     </main>
 
     <script>
+      if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("/service-worker.js"));
+
       const form = document.querySelector('#analysis-form');
       const textarea = document.querySelector('#text');
       const count = document.querySelector('#word-count');

@@ -1,5 +1,7 @@
 # Tino API
 
+> The stricter contract described below is prepared on the offline-quality review branch. It is not a claim that the production deployment has been updated.
+
 Base URL (production): `https://tino-deploy.vercel.app`
 
 ## `GET /`
@@ -53,7 +55,9 @@ Analyzes an English text against a target register.
 
 - `422`: invalid context or text length.
 - `500`: missing `OPENAI_API_KEY`.
-- `502`: OpenAI request failure or invalid model JSON.
+- `502`: provider failure, invalid JSON/schema, a mismatched register or an annotation quote absent from the submitted text.
+
+The exact output contract is documented in [analysis.schema.json](../schemas/analysis.schema.json). Extra fields and empty required strings are rejected. A valid no-change report uses `annotations: []`. Translation also rejects changes to the register, annotation count, quotes or rewrite suggestions.
 
 The frontend intentionally displays a localized generic error instead of exposing provider or credential details.
 

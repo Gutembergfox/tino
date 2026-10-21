@@ -1,14 +1,14 @@
 import json
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from openai import OpenAI
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 load_dotenv()
 app = FastAPI(title="Tino")
@@ -101,16 +101,44 @@ class TranslationRequest(BaseModel):
     analysis: dict[str, Any]
 
 
+class Annotation(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    quote: str = Field(min_length=1)
+    issue: str = Field(min_length=1)
+    register_break: str = Field(min_length=1)
+    transfer_hypothesis: str = Field(min_length=1)
+    why_it_fails: str = Field(min_length=1)
+    rewrite_suggestion: str = Field(min_length=1)
+
+
+class AnalysisReport(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    target_register: Literal["academic", "professional", "casual"]
+    overall_assessment: str = Field(min_length=1)
+    annotations: list[Annotation]
+    transfer_pattern_summary: str = Field(min_length=1)
+
+
 def parse_model_json(raw: str) -> dict:
     cleaned = raw.strip()
     if cleaned.startswith("```"):
-        cleaned = cleaned.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+        lines = cleaned.splitlines()
+        if len(lines) < 3 or lines[0] not in {"```", "```json"} or lines[-1] != "```":
+            raise HTTPException(502, "A resposta do modelo não veio em JSON válido.")
+        cleaned = "\n".join(lines[1:-1])
     try:
         result = json.loads(cleaned)
-    except json.JSONDecodeError as exc:
-        raise HTTPException(502, "A resposta do modelo não veio em JSON válido. Tente novamente.") from exc
-    if not isinstance(result, dict):
-        raise HTTPException(502, "O formato da resposta foi inesperado.")
+        return AnalysisReport.model_validate(result).model_dump()
+    except (json.JSONDecodeError, ValidationError) as exc:
+        raise HTTPException(502, "A resposta do modelo não segue o formato esperado.") from exc
+
+
+def validate_analysis(raw: str, source: str, context: str) -> dict:
+    result = parse_model_json(raw)
+    if result["target_register"] != context:
+        raise HTTPException(502, "A análise retornou um registro diferente do solicitado.")
+    if any(item["quote"] not in source for item in result["annotations"]):
+        raise HTTPException(502, "A análise retornou uma citação ausente do texto.")
     return result
 
 
@@ -156,7 +184,7 @@ async def analyze(request: AnalysisRequest) -> dict:
             ),
             text={"format": {"type": "json_object"}},
         )
-        return parse_model_json(response.output_text)
+        return validate_analysis(response.output_text, text, context)
     except HTTPException:
         raise
     except Exception as exc:
@@ -181,7 +209,7 @@ async def analyze_portuguese(request: AnalysisRequest) -> dict:
             input=f"Registro declarado: {context}.\n\nTexto em português brasileiro:\n{text}",
             text={"format": {"type": "json_object"}},
         )
-        return parse_model_json(response.output_text)
+        return validate_analysis(response.output_text, text, context)
     except HTTPException:
         raise
     except Exception as exc:
@@ -204,8 +232,13 @@ Keep exactly the same JSON keys, structure, and annotation count. Translate the 
         )
         raw = response.output_text.strip()
         translated = parse_model_json(raw)
-        if not translated.get("overall_assessment") or not isinstance(translated.get("annotations"), list):
-            raise HTTPException(502, "A tradução retornou um formato incompleto.")
+        original = AnalysisReport.model_validate(request.analysis).model_dump()
+        if translated["target_register"] != original["target_register"]:
+            raise HTTPException(502, "A tradução alterou o registro.")
+        original_quotes = [(a["quote"], a["rewrite_suggestion"]) for a in original["annotations"]]
+        translated_quotes = [(a["quote"], a["rewrite_suggestion"]) for a in translated["annotations"]]
+        if translated_quotes != original_quotes:
+            raise HTTPException(502, "A tradução alterou citações, sugestões ou quantidade de anotações.")
         return translated
     except HTTPException:
         raise

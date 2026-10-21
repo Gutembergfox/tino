@@ -4,6 +4,8 @@ Tino is a register-calibration assistant for Brazilian learners of English. It u
 
 Tino is not a grammar checker. Its goal is to help learners move between academic, professional, and casual registers without treating Brazilian Portuguese as a defect.
 
+**Project status:** AI-assisted prototype. Register and transfer explanations are hypotheses requiring review; model accuracy and educational efficacy have not been established. See the [offline tests](docs/TESTING.md) and [provisional evaluation protocol](evaluation/README.md).
+
 ## Live demo
 
 https://tino-deploy.vercel.app
@@ -62,7 +64,7 @@ The frontend can request `/translate` when the user switches a completed report 
 
 This project was built with Codex as the primary development collaborator. Codex was used to shape the product concept, scaffold the FastAPI MVP, implement the bilingual frontend, integrate and debug the OpenAI Responses API, generate the mascot asset, write the sociolinguistic project pitch and technical documentation, run model smoke tests, and deploy the application to Vercel.
 
-GPT-5.6 is the runtime model behind Tino's analysis. It receives the project's sociolinguistic system prompt together with the learner's English text and declared target context, then returns structured JSON containing the overall assessment, register-break annotations, transfer hypotheses, and rewrite suggestions. The `test_tino.py` smoke test independently verifies that this GPT-5.6 response is valid JSON and contains the expected analysis fields.
+GPT-5.6 is the runtime model behind Tino's analysis. It receives the project's sociolinguistic system prompt together with the learner's English text and declared target context, then returns structured JSON containing the overall assessment, register-break annotations, transfer hypotheses, and rewrite suggestions. The current offline suite validates software behaviour with mocked Responses API outputs. It does not measure the runtime model's linguistic quality. The former smoke script called Chat Completions and attempted JSON parsing without assertions.
 
 Codex accelerated the workflow by turning sociolinguistic requirements into a working product loop: prompt design, API contract, UI rendering, test fixture, deployment configuration, and judge-facing documentation were developed and checked together.
 
@@ -96,14 +98,16 @@ The project treats register as language associated with a situation of use and t
 
 Tino by Rapôso, 2026.
 
-## Testing the sociolinguistic model
-
-Run the direct model test from the project root:
+## Testing without paid API calls
 
 ```bash
-python3 test_tino.py
+python -m pip install -r requirements-dev.txt
+python -m pytest
+python evaluation/validate_cases.py
 ```
 
-The script loads `OPENAI_API_KEY` from `.env`, sends a controlled academic-register sample to `gpt-5.6`, prints the raw response, and validates that the result is JSON. It checks the same transfer-oriented behavior used by the application, including conversational markers, false cognates, and Portuguese calques.
+See [testing instructions](docs/TESTING.md), the [output schema](schemas/analysis.schema.json), and the [linguistic evaluation protocol](evaluation/README.md). The offline suite mocks the provider and blocks network sockets. A passing suite is evidence about the software contract, not model accuracy.
 
-See [`docs/TESTING.md`](docs/TESTING.md) for the test rationale, expected output contract, and troubleshooting guidance.
+The new tests, schema, evaluation cases and documentation were developed with AI assistance and executed in an isolated environment. The synthetic linguistic cases still require independent review.
+
+These changes are prepared on a review branch because the repository's development guide states that pushes to main can trigger production deployment. Merging should follow a separate deployment decision.

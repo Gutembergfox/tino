@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Tino analysis report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "target_register",
+    "overall_assessment",
+    "annotations",
+    "transfer_pattern_summary"
+  ],
+  "properties": {
+    "target_register": {
+      "enum": [
+        "academic",
+        "professional",
+        "casual"
+      ]
+    },
+    "overall_assessment": {
+      "type": "string",
+      "minLength": 1
+    },
+    "transfer_pattern_summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "annotations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "quote",
+          "issue",
+          "register_break",
+          "transfer_hypothesis",
+          "why_it_fails",
+          "rewrite_suggestion"
+        ],
+        "properties": {
+          "quote": {
+            "type": "string",
+            "minLength": 1
+          },
+          "issue": {
+            "type": "string",
+            "minLength": 1
+          },
+          "register_break": {
+            "type": "string",
+            "minLength": 1
+          },
+          "transfer_hypothesis": {
+            "type": "string",
+            "minLength": 1
+          },
+          "why_it_fails": {
+            "type": "string",
+            "minLength": 1
+          },
+          "rewrite_suggestion": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

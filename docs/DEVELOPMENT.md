@@ -3,7 +3,7 @@
 ## Requirements
 
 - Python 3.10 or newer
-- An OpenAI API key with access to `gpt-5.6`
+- No API key for offline tests; a separately authorized API key is needed only for live analysis
 - Git
 
 ## Local workflow
@@ -11,7 +11,7 @@
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements-dev.txt
 uvicorn main:app --reload
 ```
 
@@ -27,6 +27,10 @@ OPENAI_API_KEY=your_api_key_here
 
 Never commit `.env`. The repository `.gitignore` excludes it. On Vercel, set the same variable in the project's Environment Variables settings.
 
+## Offline verification first
+
+Run `python -m pytest` and `python evaluation/validate_cases.py` before considering any live request. See [TESTING.md](TESTING.md). Do not use real keys or model calls in CI.
+
 ## Validation checklist
 
 Before pushing changes:
@@ -35,7 +39,8 @@ Before pushing changes:
 python3 -m py_compile main.py
 ```
 
-Then verify manually:
+The following manual checks are separate from the offline suite. Analysis requests require explicit authorization for provider costs:
+
 
 1. `/` loads the interface and mascot.
 2. `/about` loads the pitch and references.

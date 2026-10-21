@@ -1,49 +1,39 @@
-# Sociolinguistic Model Testing
+# Offline software tests and linguistic evaluation
 
-## Purpose
+## Run without a key or provider access
 
-`test_tino.py` is a direct smoke test for Tino's model instruction set. It bypasses the browser and FastAPI route so that model behavior and JSON serialization can be checked independently.
-
-## Run the test
-
-From the project root:
+Tested with Python 3.13 in an isolated environment:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
-python3 test_tino.py
+python -m pip install -r requirements-dev.txt
+python -m pytest
+python evaluation/validate_cases.py
 ```
 
-The project must have a local `.env` containing `OPENAI_API_KEY`. The key is read by `python-dotenv` and is never printed.
+Dependency installation needs access to the package registry. The tests themselves block network sockets with pytest-socket; only local Unix sockets used by Python's event loop are allowed. Test imports suppress dotenv loading and remove any existing OPENAI_API_KEY. Provider calls are mocked with an inert placeholder. There are no model calls, live credentials or paid API tests.
 
-## Test fixture
+`python test_tino.py` is a compatibility entry point for this same offline suite. It replaces the historical script that called Chat Completions and merely attempted JSON parsing.
 
-The fixture is an English paragraph submitted for the academic register. It intentionally includes:
+## What is checked
 
-- discourse openers such as `So`;
-- conversational engagement markers such as `You know`;
-- filler `Like`;
-- the false cognates `pretend` and `actually`;
-- the Portuguese calque `Thanks God`;
-- a dative-subject pattern beginning with `For me`.
+- English 50/500-word boundaries; Portuguese limits and invalid registers.
+- Responses API call construction for both analysis routes.
+- Schema-valid no-change output with an empty annotation list.
+- Invalid JSON, missing/wrong fields, hallucinated quotes and mismatched registers.
+- Missing credentials and sanitized provider errors.
+- Translation preservation of register, annotation count, quotes and rewrite suggestions.
+- Structure and endpoint compatibility of the provisional evaluation cases.
 
-These forms are chosen because they let the test distinguish register calibration from generic grammar correction.
+The JSON contract is in [analysis.schema.json](../schemas/analysis.schema.json). The backend validates its typed equivalent before returning a model report. Schema tests do not establish natural-language correctness.
 
-## Expected output
+## What is not checked
 
-The model should return valid JSON with these top-level fields:
+No live model quality, latency, provider availability, deployment behaviour, browser rendering or educational impact is established by this suite. The [linguistic evaluation protocol](../evaluation/README.md) describes a separate, not-yet-run process including no-change cases and human review. Historical README statements that the old smoke script checked expected fields or linguistic behaviour were too strong: it contained no assertions.
 
-- `target_register`;
-- `overall_assessment`;
-- `annotations`;
-- `transfer_pattern_summary`.
+## Verified execution
 
-Natural-language fields should be in Brazilian Portuguese. `quote` and `rewrite_suggestion` should remain in English. Each annotation should explain the likely Portuguese transfer mechanism and why the form is or is not appropriate for the academic context.
+On 21 October 2026, **33 tests passed** in a clean Linux Python 3.13.13 virtual environment installed from `requirements-dev.txt` and the pinned constraints. `pip check` reported no broken requirements. An additional offline SDK transport test exercises the installed OpenAI client's real Responses serialization and output parsing through an in-memory HTTPX2 transport; it makes no network request. The provisional case validator accepted 12 cases, including six explicit no-change cases.
 
-## Troubleshooting
-
-- **Missing key:** confirm that `.env` is in the project root and contains `OPENAI_API_KEY`.
-- **Connection error:** check network access and the OpenAI account's API access.
-- **Invalid JSON:** inspect the raw response printed by the script and verify that the system prompt still requires strict JSON.
-- **Model access error:** verify that the configured account can use `gpt-5.6`.
+The original connected-computer execution service became unavailable. Verification used an isolated remote sandbox with public source files only. Production deployment and live model evaluation were not performed.

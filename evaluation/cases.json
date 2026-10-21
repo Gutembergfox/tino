@@ -1,0 +1,110 @@
+[
+  {
+    "id": "en_academic_keep",
+    "language": "en",
+    "context": "academic",
+    "expectation": "no_change",
+    "text": "The present study examines how participants describe changes in their daily reading habits. The analysis focuses on the accounts collected during the interviews and does not establish a causal relationship between reading frequency and language development. These observations are limited to the sample described here, and further research would be needed before extending the findings to other contexts.",
+    "rationale": "Accept cautious academic framing; do not invent register breaks.",
+    "annotation_status": "AI-assisted provisional case; independent linguistic review pending"
+  },
+  {
+    "id": "en_professional_keep",
+    "language": "en",
+    "context": "professional",
+    "expectation": "no_change",
+    "text": "Thank you for sending the updated draft. I have reviewed the introduction and added comments on the terminology used in the final section. Please let me know whether you would prefer a shorter summary for the meeting. Once you confirm the intended audience, I can revise the wording and return a new version for your review.",
+    "rationale": "Accept polite professional requests and the conditional offer.",
+    "annotation_status": "AI-assisted provisional case; independent linguistic review pending"
+  },
+  {
+    "id": "en_casual_keep",
+    "language": "en",
+    "context": "casual",
+    "expectation": "no_change",
+    "text": "Hey, thanks for the message! I was thinking we could read the article together after class. You know, it might be easier to talk through the examples over coffee. I am free on Friday afternoon, but we can choose another day if that works better for you. Just send me a message when you have a moment.",
+    "rationale": "Do not flag you know, just or casual phrasing solely for being informal.",
+    "annotation_status": "AI-assisted provisional case; independent linguistic review pending"
+  },
+  {
+    "id": "pt_academic_keep",
+    "language": "pt",
+    "context": "academic",
+    "expectation": "no_change",
+    "text": "Os resultados apresentados descrevem tendências observadas nesta amostra. A análise não permite estabelecer relações causais nem generalizar as conclusões para outras populações. Estudos adicionais poderão examinar a estabilidade desses padrões em contextos distintos.",
+    "rationale": "Preserve cautious academic claims.",
+    "annotation_status": "AI-assisted provisional case; independent linguistic review pending"
+  },
+  {
+    "id": "pt_professional_keep",
+    "language": "pt",
+    "context": "professional",
+    "expectation": "no_change",
+    "text": "Agradeço o envio da versão revisada. Incluí comentários sobre a terminologia na última seção. Por favor, confirme o público previsto para que eu possa ajustar a extensão do resumo antes da reunião.",
+    "rationale": "Accept polite professional language.",
+    "annotation_status": "AI-assisted provisional case; independent linguistic review pending"
+  },
+  {
+    "id": "pt_casual_keep",
+    "language": "pt",
+    "context": "casual",
+    "expectation": "no_change",
+    "text": "Oi! A gente pode conversar depois da aula, né? Não precisa trazer o livro não. Eu levo o meu e a gente olha os exemplos junto.",
+    "rationale": "Do not stigmatize a gente, né or reinforced negation in casual context; no forced historical diagnosis.",
+    "annotation_status": "AI-assisted provisional case; independent linguistic review pending"
+  },
+  {
+    "id": "en_academic_shift",
+    "language": "en",
+    "context": "academic",
+    "expectation": "contextual_review",
+    "text": "The present report describes the reading activities used during the course. You know, the whole thing was kind of a big deal for the group. The participants submitted short notes after each session, and those notes were examined to identify recurring themes. The analysis remains exploratory because the number of participants was small and no comparison group was included.",
+    "rationale": "Review you know and kind of a big deal for academic register; do not infer L1 from phrase alone.",
+    "annotation_status": "AI-assisted provisional case; independent linguistic review pending"
+  },
+  {
+    "id": "en_professional_shift",
+    "language": "en",
+    "context": "professional",
+    "expectation": "contextual_review",
+    "text": "Dear project coordinator, I have completed the requested review of the document and attached the updated version for your consideration. The last section was a total mess, lol, so I changed it. Please review the comments before the scheduled meeting and let me know whether any terminology should be aligned with the approved glossary for this project.",
+    "rationale": "Review dismissive wording and lol; preserve the concrete request and do not diagnose the writer.",
+    "annotation_status": "AI-assisted provisional case; independent linguistic review pending"
+  },
+  {
+    "id": "en_ambiguous_meaning",
+    "language": "en",
+    "context": "academic",
+    "expectation": "contextual_review",
+    "text": "The actors pretend to disagree during the training exercise so that the observers can practice identifying different argumentative strategies. Actually, the disagreement is part of the script and does not reflect the actors' personal views. The analysis considers how participants respond to this simulated exchange and distinguishes their reported impressions from claims about real interpersonal conflict.",
+    "rationale": "Pretend and actually are legitimate here; do not mechanically replace them as false cognates.",
+    "annotation_status": "AI-assisted provisional case; independent linguistic review pending"
+  },
+  {
+    "id": "pt_academic_shift",
+    "language": "pt",
+    "context": "academic",
+    "expectation": "contextual_review",
+    "text": "Este relatório descreve as atividades realizadas durante o curso. A coleta foi, tipo assim, uma coisa superlegal, sabe? Os registros foram organizados por tema, e a análise se limita aos relatos produzidos pelos participantes.",
+    "rationale": "Review conversational fillers against declared academic register without calling variants intrinsically wrong.",
+    "annotation_status": "AI-assisted provisional case; independent linguistic review pending"
+  },
+  {
+    "id": "pt_professional_shift",
+    "language": "pt",
+    "context": "professional",
+    "expectation": "contextual_review",
+    "text": "Prezada equipe, encaminho a versão revisada do relatório. O texto anterior estava uma bagunça danada, kkk. Solicito a confirmação dos termos do glossário antes da reunião de sexta-feira.",
+    "rationale": "Review dismissive wording and kkk; do not rewrite the whole message unnecessarily.",
+    "annotation_status": "AI-assisted provisional case; independent linguistic review pending"
+  },
+  {
+    "id": "pt_context_uncertain",
+    "language": "pt",
+    "context": "casual",
+    "expectation": "contextual_review",
+    "text": "A reunião foi remarcada, mas eu não vou não. A gente já tinha combinado outra coisa. Se der, eu passo lá mais tarde.",
+    "rationale": "Accept casual negation; do not infer a historical grammaticalization stage from one short sample.",
+    "annotation_status": "AI-assisted provisional case; independent linguistic review pending"
+  }
+]
